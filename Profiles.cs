@@ -1,7 +1,18 @@
 ﻿using System;
 using System.Data.SqlClient;
+// Add the required NuGet package reference to your project:  
+// Microsoft.Extensions.Configuration  
+// Microsoft.Extensions.Configuration.Json  
+
+// Ensure the following using directive is present:  
 using Microsoft.Extensions.Configuration;
+
+// If the error persists, ensure the NuGet packages are installed in your project.  
+// You can install them using the NuGet Package Manager in Visual Studio or via the Package Manager Console:  
+// Install-Package Microsoft.Extensions.Configuration  
+// Install-Package Microsoft.Extensions.Configuration.Json
 using System.IO;
+using Microsoft.Extensions.Configuration.Json;
 
 namespace MusicApp
 {
@@ -30,15 +41,17 @@ namespace MusicApp
 
         private readonly string connectionString;
 
+        // Update the constructor in UserProfile to fix the error
         public UserProfile()
         {
             var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false)
+                .SetBasePath(Directory.GetCurrentDirectory()) // Required to locate appsettings.json correctly
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
             connectionString = config.GetConnectionString("DefaultConnection");
         }
+
 
         public UserProfile(string name, string email, string password, string phone, int age, string country)
             : this()
@@ -55,7 +68,23 @@ namespace MusicApp
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                string query = "INSERT INTO UserProfiles (Name, Email, Password, Phone, Age, Country) VALUES (@Name, @Email, @Password, @Phone, @Age, @Country)";
+                connection.Open();
+
+                // Check if email exists
+                string checkQuery = "SELECT COUNT(*) FROM UserProfiles WHERE Email = @Email";
+                SqlCommand checkCmd = new SqlCommand(checkQuery, connection);
+                checkCmd.Parameters.AddWithValue("@Email", email);
+                int count = (int)checkCmd.ExecuteScalar();
+
+                if (count > 0)
+                {
+                    Console.WriteLine("A user with this email already exists.");
+                    return;
+                }
+
+                // Insert if not exists
+                string query = "INSERT INTO UserProfiles (Name, Email, Password, Phone, Age, Country) " +
+                               "VALUES (@Name, @Email, @Password, @Phone, @Age, @Country)";
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@Name", name);
                 command.Parameters.AddWithValue("@Email", email);
@@ -64,9 +93,7 @@ namespace MusicApp
                 command.Parameters.AddWithValue("@Age", age);
                 command.Parameters.AddWithValue("@Country", country);
 
-                connection.Open();
                 command.ExecuteNonQuery();
-                connection.Close();
             }
         }
 
