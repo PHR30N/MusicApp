@@ -15,6 +15,8 @@ namespace MusicApp
         static void Main(string[] args)
         {
             UserProfile user1 = new UserProfile("Youssed","y@gmail.com", "123456789", "0123456789", 20, "Tunisia");
+            UserProfile user2 = new UserProfile("mohamed", "m@gmail.com", "987654321", "0123456789", 20, "negeria");
+
             user1.SaveToDatabase();
             user1.ViewProfile();
         }
