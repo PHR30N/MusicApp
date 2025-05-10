@@ -1,16 +1,6 @@
 ﻿using System;
-using System.Data.SqlClient;
-// Add the required NuGet package reference to your project:  
-// Microsoft.Extensions.Configuration  
-// Microsoft.Extensions.Configuration.Json  
-
-// Ensure the following using directive is present:  
+using System.Data.SqlClient;  
 using Microsoft.Extensions.Configuration;
-
-// If the error persists, ensure the NuGet packages are installed in your project.  
-// You can install them using the NuGet Package Manager in Visual Studio or via the Package Manager Console:  
-// Install-Package Microsoft.Extensions.Configuration  
-// Install-Package Microsoft.Extensions.Configuration.Json
 using System.IO;
 using Microsoft.Extensions.Configuration.Json;
 
